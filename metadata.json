@@ -1,0 +1,8 @@
+{
+  "name": "meChat",
+  "description": "A modern, neon-accented messaging application with AI capabilities, stories, and voice/video calling simulations.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
