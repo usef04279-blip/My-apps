@@ -1,9 +1,9 @@
-import { GoogleGenAI, Chat } from "@google/genai";
+import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { Message } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-// Initialize safe AI instance
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+// The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+// We assume this variable is pre-configured, valid, and accessible.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 // Keep track of chat sessions in memory
 const chatSessions: Record<string, Chat> = {};
@@ -13,13 +13,6 @@ export const sendMessageToAI = async (
   userMessage: string,
   history: Message[]
 ): Promise<AsyncGenerator<string, void, unknown>> => {
-  if (!ai) {
-    // Fallback generator if no API key
-    return (async function* () {
-      yield "I'm currently offline (No API Key provided). Please configure the environment variable.";
-    })();
-  }
-
   try {
     let chatSession = chatSessions[chatId];
 
@@ -42,8 +35,9 @@ export const sendMessageToAI = async (
     // Generator function to yield chunks
     async function* streamResponse() {
         for await (const chunk of resultStream) {
-            if (chunk.text) {
-                yield chunk.text;
+            const c = chunk as GenerateContentResponse;
+            if (c.text) {
+                yield c.text;
             }
         }
     }
